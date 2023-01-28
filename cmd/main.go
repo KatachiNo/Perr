@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	postgdb "./internal/postgresDataBase"
+	"github.com/KatachiNo/Perr/internal/postgresDataBase"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/shopspring/decimal"
@@ -59,7 +59,7 @@ func getAllProducts(w http.ResponseWriter, r *http.Request) {
 func ConnectionWithDB(resp string) []ProductsTable {
 	//var Data []ProductsTable
 
-	var connStr postgdb.confData = postgdb.ConfigDB{
+	var connStr postgresDataBase.ConfigDB = postgresDataBase.ConfigDB{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
@@ -68,8 +68,8 @@ func ConnectionWithDB(resp string) []ProductsTable {
 		SSLMode:  viper.GetString("db.host"),
 	}
 
-	db, _ := postgdb.postgresDataBase.ConnectToDB(connStr)
-	
+	db, _ := postgresDataBase.ConnectToDB(connStr)
+
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("error loading env variables: %s", err.Error())
 	}
