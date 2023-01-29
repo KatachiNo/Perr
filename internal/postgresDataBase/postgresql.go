@@ -14,9 +14,9 @@ type ConfigDB struct {
 	SSLMode  string
 }
 
-func ConnectToDB(confData ConfigDB) (*sql.DB, error) {
+func ConnectToDB(cnf ConfigDB) (*sql.DB, error) {
 
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s", confData.Username, confData.Password, confData.DBName, confData.SSLMode)
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s", cnf.Username, cnf.Password, cnf.DBName, cnf.SSLMode)
 
 	db, err := sql.Open("postgres", connStr)
 
