@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 
 	pdb "github.com/KatachiNo/Perr/internal/postgresDataBase"
+	"github.com/KatachiNo/Perr/internal/server"
 	"github.com/gorilla/mux"
 	"github.com/shopspring/decimal"
 )
@@ -41,7 +43,21 @@ type UserPassword struct {
 	Password string `json:"password"`
 }
 
+var (
+	serverConf string
+)
+
+func init() {
+	flag.StringVar(&serverConf, "config-path", "configs/server.yaml", "path to config file")
+}
+
 func main() {
+	flag.Parse()
+	
+	s := server.New(server.NewConfig())
+	if err := s.Start(); err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Print("Are u ready?\n")
 
