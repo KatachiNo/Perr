@@ -30,12 +30,10 @@ func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc(testHey, hey).Methods("GET")
 }
 
-func NewHandler() handlers.Handler {
-	return &handler{}
+func hey(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, "hey")
 }
 
-func hey(w http.ResponseWriter, r *http.Request) {
-
-	io.WriteString(w, "hey")
-
+func New() handlers.Handler {
+	return &handler{}
 }

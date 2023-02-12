@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
+	"log"
+	"net/http"
+	"time"
 
 	"github.com/KatachiNo/Perr/internal/user"
 	"github.com/gorilla/mux"
@@ -15,11 +15,17 @@ import (
 func main() {
 
 	router := mux.NewRouter()
-	handler := user.NewHandler()
+	handler := user.New()
 	handler.Register(router)
 
 	fmt.Print("Are u ready?\n")
 
+	//uploadConfiguration()
+
+	start(router)
+}
+
+func uploadConfiguration() {
 	var vspec = viper.New()
 	vspec.AddConfigPath(".")
 	vspec.SetConfigName("PerrAppE")
@@ -33,9 +39,17 @@ func main() {
 
 	t := vspec.GetInt("DB_PASSWORD")
 	fmt.Printf("%s sd", t)
+}
 
-	r := mux.NewRouter()
+func start(router *mux.Router) {
 
-	log.Fatal(http.ListenAndServe(":8000", r))
+	serv := &http.Server{
+		Addr:         ":8080",
+		Handler:      router,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	log.Fatal(serv.ListenAndServe())
 
 }
