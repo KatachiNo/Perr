@@ -1,3 +1,7 @@
+server:
+  type: port
+  port: 8080
+
 db:
   username: postgres
   host: localhost

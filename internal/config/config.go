@@ -8,7 +8,12 @@ import (
 )
 
 type Config struct {
-	db struct {
+	Server struct {
+		Type string `yaml:"type" env-default:"port"`
+		Port string `yaml:"port" env-default:"8080"`
+	} `yaml:"server"`
+
+	Db struct {
 		Username string `yaml:"username"`
 		Host     string `yaml:"host"`
 		Port     string `yaml:"port"`
@@ -26,7 +31,7 @@ func GetConfig() *Config {
 		l := logg.GetLogger()
 		l.Info("Getting configuration")
 		instance = &Config{}
-		if err := cleanenv.ReadConfig("../../configs/config.yaml", instance); err != nil {
+		if err := cleanenv.ReadConfig("configs/config.yml", instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
 
 			l.Info(help)
