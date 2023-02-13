@@ -22,8 +22,8 @@
 .vscode
 
 #Remove logs
-.logFiles
-
+*.log
+/logFiles
 
 # Default ignored files
 /shelf/
