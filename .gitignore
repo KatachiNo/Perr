@@ -20,3 +20,6 @@
 #ETC
 .idea
 .vscode
+
+#Remove logs
+.logFiles

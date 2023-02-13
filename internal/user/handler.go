@@ -1,9 +1,10 @@
 package user
 
 import (
-	"github.com/KatachiNo/Perr/internal/handlers"
 	"io"
 	"net/http"
+
+	"github.com/KatachiNo/Perr/internal/handlers"
 
 	"github.com/gorilla/mux"
 )
@@ -23,11 +24,11 @@ const (
 	testHey = "/test"
 )
 
-func New() handlers.Handler {
-	return &handler{}
+type handler struct {
 }
 
-type handler struct {
+func New() handlers.Handler {
+	return &handler{}
 }
 
 func (h *handler) Register(router *mux.Router) {
@@ -41,14 +42,13 @@ func (h *handler) Register(router *mux.Router) {
 
 }
 
+func hey(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, "hey")
+}
 func getProductsAll(writer http.ResponseWriter, request *http.Request) {
 
 }
 
 func prodAdd(w http.ResponseWriter, r *http.Request) {
 
-}
-
-func hey(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "hey")
 }
