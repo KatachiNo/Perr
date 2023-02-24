@@ -13,14 +13,17 @@ type Config struct {
 		Port string `yaml:"port" env-default:"8080"`
 	} `yaml:"server"`
 
-	Db struct {
-		Username string `yaml:"username"`
-		Host     string `yaml:"host"`
-		Port     string `yaml:"port"`
-		Dbname   string `yaml:"dbname"`
-		SSLMode  string `yaml:"sslmode"`
-		Password int    `yaml:"password" env:"PASSWORD" env-default:"1234"`
-	} `yaml:"db"`
+	PostgresDb `yaml:"postgresConfigDb"`
+}
+
+type PostgresDb struct {
+	Username                 string `yaml:"username"`
+	Host                     string `yaml:"host"`
+	Port                     string `yaml:"port"`
+	Dbname                   string `yaml:"dbname"`
+	SSLMode                  string `yaml:"sslmode"`
+	Password                 string `yaml:"password" env:"PASSWORD" env-default:"1234"`
+	MaxAttemptsForConnection string `yaml:"max-attempts-for-connection" env-default:"10"`
 }
 
 var instance *Config

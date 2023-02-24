@@ -15,7 +15,7 @@ import (
 	"github.com/KatachiNo/Perr/pkg/logg"
 	_ "github.com/lib/pq"
 
-	"github.com/KatachiNo/Perr/internal/user"
+	"github.com/KatachiNo/Perr/internal/dataBase/user"
 	"github.com/gorilla/mux"
 )
 

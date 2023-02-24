@@ -2,14 +2,10 @@ package server
 
 import (
 	"database/sql"
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
-	pdb "github.com/KatachiNo/Perr/internal/postgresDataBase"
 	"github.com/shopspring/decimal"
-	"github.com/spf13/viper"
 )
 
 func newDB(dburl string) (*sql.DB, error) {
@@ -72,38 +68,15 @@ func getAllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
-	var AllProducts = ConnectionWithDB("Products")
-	json.NewEncoder(w).Encode(AllProducts)
+	//var AllProducts = ConnectionWithDB("products")
+	//json.NewEncoder(w).Encode(AllProducts)
 }
 
-func ConnectionWithDB(resp string) []ProductsTable {
+func ConnectionWithDB(resp string, db *sql.DB) []ProductsTable {
 
 	var Data []ProductsTable
 
-	viper.SetConfigName("config")
-	viper.AddConfigPath("./configs/")
-	err := viper.ReadInConfig()
-
-	if err != nil { // Handle errors reading the config file
-		panic(fmt.Errorf("fatal error config file: %w", err))
-	}
-
-	var connStr pdb.ConfigDB = pdb.ConfigDB{
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
-		Password: viper.GetString("DB_PASSWORD"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
-	}
-
-	db, err333 := pdb.ConnectToDB(connStr)
-
-	if err333 != nil {
-		log.Fatalf(": %s", err333.Error())
-	}
-
-	rows, _ := db.Query(`SELECT * FROM "Products"`)
+	rows, _ := db.Query(`SELECT * FROM "products"`)
 	for rows.Next() {
 		var pTable = ProductsTable{}
 		er := rows.Scan(&pTable.Category, &pTable.PictureAddress, &pTable.Id, &pTable.QuantityOfGoods, &pTable.Lastprice)

@@ -2,9 +2,10 @@ server:
   type: port
   port: 8080
 
-db:
+postgresConfigDb:
   username: postgres
   host: localhost
   port: 5432
   dbname: postgres
   sslmode: disable
+  max-attempts-for-connection: 10
