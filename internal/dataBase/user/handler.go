@@ -15,11 +15,11 @@ const (
 	loginChangeData     = "/login/changeData"
 	loginForgetPassword = "/login/forgetPassword"
 
-	productsAll               = "/products/all"
-	productsAdd               = "/products/add"
-	productsChangeProductItem = "/products/changeProductItem"
-	productsDeleteItem        = "/products/delete"
-	productsPriceStory        = "/products/PriceStory"
+	productsAll               = "/db/all"
+	productsAdd               = "/db/add"
+	productsChangeProductItem = "/db/changeProductItem"
+	productsDeleteItem        = "/db/delete"
+	productsPriceStory        = "/db/PriceStory"
 
 	testHey = "/test"
 )

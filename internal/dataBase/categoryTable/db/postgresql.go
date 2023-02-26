@@ -1,4 +1,4 @@
-package db
+package categoryTable
 
 type Storage interface {
 }

@@ -29,13 +29,13 @@ func newDB(dburl string) (*sql.DB, error) {
 //r.HandleFunc("/login/changeData", changeData)
 //r.HandleFunc("/login/forgetPassword", forgetPassword)
 //
-//r.HandleFunc("/products/all", getAllProducts).Methods("GET")
-//r.Handle("/products/add", isAuthorized(addProduct)).Methods("POST")
-//r.HandleFunc("/products/changeProductItem", changeProduct)
-//r.HandleFunc("/products/delete", deleteProduct)
+//r.HandleFunc("/db/all", getAllProducts).Methods("GET")
+//r.Handle("/db/add", isAuthorized(addProduct)).Methods("POST")
+//r.HandleFunc("/db/changeProductItem", changeProduct)
+//r.HandleFunc("/db/delete", deleteProduct)
 //
-//r.HandleFunc("/products/getPriceStory", deleteProduct)
-//r.HandleFunc("/products/cha", deleteProduct)
+//r.HandleFunc("/db/getPriceStory", deleteProduct)
+//r.HandleFunc("/db/cha", deleteProduct)
 //s.router.HandleFunc("/test", s.hey())
 //}
 
@@ -68,7 +68,7 @@ func getAllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
-	//var AllProducts = ConnectionWithDB("products")
+	//var AllProducts = ConnectionWithDB("db")
 	//json.NewEncoder(w).Encode(AllProducts)
 }
 
@@ -76,7 +76,7 @@ func ConnectionWithDB(resp string, db *sql.DB) []ProductsTable {
 
 	var Data []ProductsTable
 
-	rows, _ := db.Query(`SELECT * FROM "products"`)
+	rows, _ := db.Query(`SELECT * FROM "db"`)
 	for rows.Next() {
 		var pTable = ProductsTable{}
 		er := rows.Scan(&pTable.Category, &pTable.PictureAddress, &pTable.Id, &pTable.QuantityOfGoods, &pTable.Lastprice)
