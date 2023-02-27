@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/KatachiNo/Perr/internal/dataBase/products"
+	productsDb "github.com/KatachiNo/Perr/internal/dataBase/products/db"
+	"github.com/KatachiNo/Perr/internal/dataBase/user"
+	"github.com/KatachiNo/Perr/pkg/client/postgresql"
 	"net"
 	"net/http"
 	"os"
@@ -15,7 +20,6 @@ import (
 	"github.com/KatachiNo/Perr/pkg/logg"
 	_ "github.com/lib/pq"
 
-	"github.com/KatachiNo/Perr/internal/dataBase/user"
 	"github.com/gorilla/mux"
 )
 
@@ -28,29 +32,17 @@ func main() {
 	conf := config.GetConfig()
 
 	l.Info("register user handler")
-	handler := user.New()
+	handler := user.NewRegister()
 	handler.Register(router)
 
-	//uploadConfiguration()
+	cli, _ := postgresql.NewClient(context.TODO(), l, conf.PostgresDb)
+	l.Info("register products handler")
+	st := productsDb.NewStorage(cli, l)
+	h := products.NewRegister(st, l)
+	h.Register(router)
 
 	start(router, conf)
 }
-
-//func uploadConfiguration() {
-//	var vspec = viper.New()
-//	vspec.AddConfigPath(".")
-//	vspec.SetConfigName("PerrAppE")
-//	vspec.SetConfigFile("env")
-//
-//	e := vspec.ReadInConfig()
-//
-//	if e != nil { // Handle errors reading the config file
-//		panic(fmt.Errorf("fatal error config file: %w", e))
-//	}
-//
-//	t := vspec.GetInt("DB_PASSWORD")
-//	fmt.Printf("%s sd", t)
-//}
 
 func start(router *mux.Router, conf *config.Config) {
 	l := logg.GetLogger()

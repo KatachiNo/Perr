@@ -7,6 +7,6 @@ type Storage interface {
 	ProductsUpdateItem(ctx context.Context, p Products) error
 	ProductDeleteItem(ctx context.Context, p Products) error
 
-	ProductFind(ctx context.Context, id string) (Products, error)
-	ProductsGetAll(ctx context.Context) (Products, error)
+	ProductFind(ctx context.Context, id string) ([]Products, error)
+	ProductsGetAll(ctx context.Context) ([]Products, error)
 }

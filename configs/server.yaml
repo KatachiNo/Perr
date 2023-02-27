@@ -1,2 +1,0 @@
-openport: ":8080"
-database_url: "user=localhost password=1234 dbname=postgres sslmode=disable"
