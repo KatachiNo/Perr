@@ -17,10 +17,9 @@ func (r db) ProductAddItem(ctx context.Context, p products.Products) error {
     (product_name, category, quantity_of_goods, last_price, available_status, picture_address)
 		VALUES ($1,$2,$3,$4,$5,$6)`
 
-	_, err := r.client.ExecContext(ctx, q, p.ProductName, p.Category, p.QuantityOfGoods, p.LastPrice, p.AvailableStatus)
+	_, err := r.client.ExecContext(ctx, q, p.ProductName, p.Category, p.QuantityOfGoods, p.LastPrice, p.AvailableStatus, p.PictureAddress)
 
 	return err
-
 }
 
 func (r db) ProductsUpdateItem(ctx context.Context, p products.Products) error {
@@ -39,24 +38,34 @@ func (r db) ProductFind(ctx context.Context, id string) ([]products.Products, er
 }
 
 func (r db) ProductsGetAll(ctx context.Context) ([]products.Products, error) {
-	//TODO implement me
-	q := `SELECT (id,product_name,category,quantity_of_goods,available_status,picture_address) FROM "Products"`
+	q := `SELECT id,product_name,category,quantity_of_goods,last_price,available_status,picture_address FROM "Products"`
 	rows, err := r.client.QueryContext(ctx, q)
-
-	var aP []products.Products
 
 	if err != nil {
 		return nil, err
 	}
 
+	arrProd := make([]products.Products, 0)
+
 	for rows.Next() {
-		p := products.Products{}
-		rows.Scan(&p.Id, &p.ProductName, &p.Category, &p.QuantityOfGoods,
-			&p.LastPrice, &p.AvailableStatus, &p.PictureAddress)
-		aP = append(aP, p)
+		pr := products.Products{}
+
+		err = rows.Scan(&pr.Id, &pr.ProductName, &pr.Category,
+			&pr.QuantityOfGoods, &pr.LastPrice, &pr.AvailableStatus,
+			&pr.PictureAddress)
+
+		if err != nil {
+			return nil, err
+		}
+
+		arrProd = append(arrProd, pr)
 	}
 
-	return aP, nil
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return arrProd, nil
 }
 
 func NewStorage(client postgresql.Client, l *logg.Logger) products.Storage {

@@ -15,7 +15,7 @@ const (
 	loginChangeData     = "/login/changeData"
 	loginForgetPassword = "/login/forgetPassword"
 
-	testHey = "/test"
+	//testHey = "/test"
 )
 
 type handler struct {
@@ -26,7 +26,7 @@ func NewRegister() handlers.Handler {
 }
 
 func (h *handler) Register(router *mux.Router) {
-	router.HandleFunc(testHey, hey).Methods("GET")
+	//router.HandleFunc(testHey, hey).Methods("GET")
 
 }
 

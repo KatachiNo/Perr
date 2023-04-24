@@ -17,12 +17,14 @@ type Client interface {
 
 func NewClient(ctx context.Context, l *logg.Logger, conf config.PostgresDb) (db *sql.DB, err error) {
 
-	l.Info("Entrance to NewClient Postgresql ")
+	l.Info("Entrance to NewClient Postgresql")
 
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		conf.Host, conf.Port, conf.Username, conf.Password, conf.Dbname)
+	fmt.Print(connStr)
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
+		fmt.Print(err)
 		return nil, err
 	}
 
