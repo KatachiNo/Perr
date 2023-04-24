@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/KatachiNo/Perr/internal/handlers"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
@@ -35,7 +36,7 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc(testHey, hey).Methods("GET")
 
-	//router.HandleFunc(productsAll, getProductsAll).Methods("GET")
+	router.HandleFunc(productsAll, h.getProductsAll).Methods("GET")
 	router.HandleFunc(productsAdd, h.productAdd).Methods("GET")
 	//router.HandleFunc(productsChangeProductItem, hey).Methods("PATCH")
 	//router.HandleFunc(productsDeleteItem, hey).Methods("DELETE")
@@ -44,21 +45,38 @@ func (h *handler) Register(router *mux.Router) {
 }
 
 func hey(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "hey")
+	io.WriteString(w, "hey11")
 }
 
-func getProductsAll(writer http.ResponseWriter, request *http.Request) {
+func (h *handler) getProductsAll(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, "testtt")
+	pro, err := h.storage.ProductsGetAll(context.TODO())
+	if err != nil {
+		w.WriteHeader(400)
+		//return err
+	}
+	//var text = "hey" + err.Error() + pro[0].ProductName
+	//io.WriteString(w, text)
+
+	js, err := json.Marshal(pro)
+	if err != nil {
+		//return err
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(js)
 
 }
 
 func (h *handler) productAdd(w http.ResponseWriter, r *http.Request) {
 
+	var t = decimal.NewFromInt(3)
 	pp := Products{
 		Id:              33,
 		ProductName:     "слива",
 		Category:        1,
 		QuantityOfGoods: 3,
-		LastPrice:       decimal.Decimal{},
+		LastPrice:       t,
 		AvailableStatus: "good",
 		PictureAddress:  "/123",
 	}
@@ -66,6 +84,7 @@ func (h *handler) productAdd(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(400)
 	}
-	io.WriteString(w, "hey???")
+	var text = "hey" + err.Error()
+	io.WriteString(w, text)
 
 }
