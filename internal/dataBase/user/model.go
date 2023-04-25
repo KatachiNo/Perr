@@ -9,8 +9,3 @@ type User struct { //Users Table
 	Salt               string `json:"-"`
 	Algorithm          string `json:"-"`
 }
-
-type CreateUserDTO struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
