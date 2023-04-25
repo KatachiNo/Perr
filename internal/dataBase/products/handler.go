@@ -112,12 +112,12 @@ func (h *handler) getProductsAll(w http.ResponseWriter, r *http.Request) {
 	arrP, err := h.storage.ProductsGetAll(context.TODO())
 
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 	}
 
 	js, errJs := json.Marshal(arrP)
 	if errJs != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 	}
 	if err == nil && errJs == nil {
 		w.WriteHeader(http.StatusOK)
