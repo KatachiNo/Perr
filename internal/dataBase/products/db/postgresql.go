@@ -2,6 +2,7 @@ package productsDb
 
 import (
 	"context"
+	"fmt"
 	"github.com/KatachiNo/Perr/internal/dataBase/products"
 	"github.com/KatachiNo/Perr/pkg/client/postgresql"
 	"github.com/KatachiNo/Perr/pkg/logg"
@@ -10,6 +11,24 @@ import (
 type db struct {
 	client postgresql.Client
 	l      *logg.Logger
+}
+
+func (r db) ProductFindOne(ctx context.Context, id int) (products.Products, error) {
+
+	q := fmt.Sprintf(`SELECT * FROM "Products" WHERE id=%d`, id)
+
+	row := r.client.QueryRowContext(ctx, q)
+	pr := products.Products{}
+	err := row.Scan(&pr.Id, &pr.ProductName, &pr.Category,
+		&pr.QuantityOfGoods, &pr.LastPrice, &pr.AvailableStatus,
+		&pr.PictureAddress)
+
+	if err != nil {
+		return pr, err
+	}
+
+	return pr, nil
+
 }
 
 func (r db) ProductAddItem(ctx context.Context, p products.Products) error {
@@ -27,14 +46,14 @@ func (r db) ProductsUpdateItem(ctx context.Context, p products.Products) error {
 	panic("implement me")
 }
 
-func (r db) ProductDeleteItem(ctx context.Context, p products.Products) error {
+func (r db) ProductDeleteItem(ctx context.Context, id int) error {
 	//TODO implement me
-	panic("implement me")
-}
 
-func (r db) ProductFind(ctx context.Context, id string) ([]products.Products, error) {
-	//TODO implement me
-	panic("implement me")
+	q := fmt.Sprintf(`DELETE FROM "Products" WHERE id=%d`, id)
+	_, err := r.client.ExecContext(ctx, q)
+
+	return err
+
 }
 
 func (r db) ProductsGetAll(ctx context.Context) ([]products.Products, error) {

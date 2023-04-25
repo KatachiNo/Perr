@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 const (
@@ -20,6 +21,7 @@ const (
 	productsChangeProductItem = "/products/changeProductItem"
 	productsDeleteItem        = "/products/delete"
 	productsPriceStory        = "/products/PriceStory"
+	productFindOne            = "/products/FindOne"
 
 	addPicture = "/products/addPicture"
 	testHey    = "/test"
@@ -44,11 +46,11 @@ func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc(productsAdd, h.productAdd).Methods("POST")
 
 	router.HandleFunc(productsChangeProductItem, hey).Methods("PATCH")
-	router.HandleFunc(productsDeleteItem, hey).Methods("DELETE")
-	router.HandleFunc(productsPriceStory, hey).Methods("GET")
+	router.HandleFunc(productsDeleteItem, h.productsDeleteItem).Methods("DELETE")
+	//router.HandleFunc(productsPriceStory, h.getProductsPriceStory).Methods("GET")
 
 	router.HandleFunc(addPicture, h.addPicture).Methods("POST")
-
+	router.HandleFunc(productFindOne, h.productFindOne).Methods("GET")
 }
 
 func (h *handler) addPicture(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +72,7 @@ func (h *handler) addPicture(w http.ResponseWriter, r *http.Request) {
 	filePath := filepath.Join("./pictureFiles/", fileName)
 	targetFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		fmt.Print(err)
 		return
 	}
@@ -78,7 +80,7 @@ func (h *handler) addPicture(w http.ResponseWriter, r *http.Request) {
 
 	_, err = io.Copy(targetFile, file)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 }
@@ -118,13 +120,51 @@ func (h *handler) productAdd(w http.ResponseWriter, r *http.Request) {
 
 	err := h.storage.ProductAddItem(context.TODO(), pp)
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 	}
 	var text = "hey33" + err.Error()
 	io.WriteString(w, text)
 
 }
 
+func (h *handler) productsDeleteItem(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	intId, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Print(errConv)
+	}
+
+	errDel := h.storage.ProductDeleteItem(context.TODO(), intId)
+	if errDel != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Print(errDel)
+	}
+}
+
+func (h *handler) productFindOne(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	intId, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Print(errConv)
+	}
+
+	pr, errFind := h.storage.ProductFindOne(context.TODO(), intId)
+	if errFind != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Print(errFind)
+	}
+
+	js, errJs := json.Marshal(pr)
+	if errJs != nil {
+		w.WriteHeader(400)
+	}
+	if errFind == nil && errJs == nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write(js)
+	}
+}
 func hey(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "добрый вечер")
 }
