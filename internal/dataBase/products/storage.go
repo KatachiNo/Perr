@@ -3,8 +3,8 @@ package products
 import "context"
 
 type Storage interface {
-	ProductAddItem(ctx context.Context, p Products) error
-	ProductsUpdateItem(ctx context.Context, p Products) error
+	ProductsAddItems(ctx context.Context, p []Products) error
+	ProductUpdateItem(ctx context.Context, p Products) error
 	ProductDeleteItem(ctx context.Context, id int) error
 
 	ProductFindOne(ctx context.Context, id int) (Products, error)

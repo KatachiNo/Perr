@@ -7,7 +7,6 @@ import (
 	"github.com/KatachiNo/Perr/internal/handlers"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
-	"github.com/shopspring/decimal"
 	"io"
 	"net/http"
 	"os"
@@ -43,7 +42,7 @@ func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc(testHey, hey).Methods("GET")
 
 	router.HandleFunc(productsAll, h.getProductsAll).Methods("GET")
-	router.HandleFunc(productsAdd, h.productAdd).Methods("POST")
+	router.HandleFunc(productsAdd, h.productsAdd).Methods("POST")
 
 	router.HandleFunc(productsChangeProductItem, hey).Methods("PATCH")
 	router.HandleFunc(productsDeleteItem, h.productsDeleteItem).Methods("DELETE")
@@ -103,28 +102,50 @@ func (h *handler) getProductsAll(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *handler) productAdd(w http.ResponseWriter, r *http.Request) {
+func (h *handler) productsAdd(w http.ResponseWriter, r *http.Request) {
+	var arrPr []Products
+	json.NewDecoder(r.Body).Decode(&arrPr)
 
-	//json.NewDecoder(r.Body).Decode()
-
-	var t = decimal.NewFromInt(3)
-	pp := Products{
-		Id:              11,
-		ProductName:     "Слива",
-		Category:        34,
-		QuantityOfGoods: 33,
-		LastPrice:       t,
-		AvailableStatus: "good",
-		PictureAddress:  "/123",
-	}
-
-	err := h.storage.ProductAddItem(context.TODO(), pp)
+	/*
+		var t = decimal.NewFromInt(3)
+		pp := Products{
+			Id:              11,
+			ProductName:     "Слива",
+			Category:        34,
+			QuantityOfGoods: 33,
+			LastPrice:       t,
+			AvailableStatus: "good",
+			PictureAddress:  "/123",
+		}
+	*/
+	/*
+		var t = decimal.NewFromInt(3)
+		pp := Products{
+			Id:              11,
+			ProductName:     "njahsdjshjdahsad",
+			Category:        34,
+			QuantityOfGoods: 33,
+			LastPrice:       t,
+			AvailableStatus: "good",
+			PictureAddress:  "/123",
+		}
+	*/
+	err := h.storage.ProductsAddItems(context.TODO(), arrPr)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	var text = "hey33" + err.Error()
-	io.WriteString(w, text)
 
+	/*
+
+		//err := h.storage.ProductsAddItems(context.TODO(), arrPr)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Print(err)
+		}
+		var text = "hey33" + err.Error()
+		io.WriteString(w, text)
+	*/
 }
 
 func (h *handler) productsDeleteItem(w http.ResponseWriter, r *http.Request) {

@@ -13,6 +13,41 @@ type db struct {
 	l      *logg.Logger
 }
 
+func (r db) ProductsAddItems(ctx context.Context, arrP []products.Products) error {
+	/*q := `INSERT INTO "Products"
+	    (product_name, category, quantity_of_goods, last_price, available_status, picture_address)
+			VALUES ($1,$2,$3,$4,$5,$6)`
+	*/
+
+	fmt.Println(arrP)
+	for _, p := range arrP {
+		fmt.Println("in for")
+		fmt.Println(p)
+
+		q := fmt.Sprintf(`INSERT INTO "Products" (product_name, category, quantity_of_goods, last_price, available_status, picture_address) VALUES ('%s','%d','%d','%s','%s','%s')`, p.ProductName, p.Category,
+			p.QuantityOfGoods, p.LastPrice.String(), p.AvailableStatus, p.PictureAddress)
+
+		fmt.Println(q)
+		//_, err := r.client.ExecContext(ctx, q, p.ProductName, p.Category,
+		//	p.QuantityOfGoods, p.LastPrice, p.AvailableStatus, p.PictureAddress)
+
+		_, err := r.client.ExecContext(ctx, q)
+
+		if err != nil {
+			fmt.Print("ошибка")
+			fmt.Print(err)
+			return err
+		}
+	}
+	return nil
+	//return nil
+}
+
+func (r db) ProductUpdateItem(ctx context.Context, p products.Products) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (r db) ProductFindOne(ctx context.Context, id int) (products.Products, error) {
 
 	q := fmt.Sprintf(`SELECT * FROM "Products" WHERE id=%d`, id)
@@ -29,21 +64,6 @@ func (r db) ProductFindOne(ctx context.Context, id int) (products.Products, erro
 
 	return pr, nil
 
-}
-
-func (r db) ProductAddItem(ctx context.Context, p products.Products) error {
-	q := `INSERT INTO "Products" 
-    (product_name, category, quantity_of_goods, last_price, available_status, picture_address)
-		VALUES ($1,$2,$3,$4,$5,$6)`
-
-	_, err := r.client.ExecContext(ctx, q, p.ProductName, p.Category, p.QuantityOfGoods, p.LastPrice, p.AvailableStatus, p.PictureAddress)
-
-	return err
-}
-
-func (r db) ProductsUpdateItem(ctx context.Context, p products.Products) error {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (r db) ProductDeleteItem(ctx context.Context, id int) error {
