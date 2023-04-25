@@ -19,8 +19,9 @@ const (
 	productsAdd               = "/products/add"
 	productsChangeProductItem = "/products/changeProductItem"
 	productsDeleteItem        = "/products/delete"
-	productsPriceStory        = "/products/PriceStory"
-	productFindOne            = "/products/FindOne"
+	//productsPriceStory        = "/products/PriceStory"
+	productFindOne    = "/products/FindOne"
+	productGetPicture = "/products/GetPicture"
 
 	addPicture = "/products/addPicture"
 	testHey    = "/test"
@@ -44,17 +45,17 @@ func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc(productsAll, h.getProductsAll).Methods("GET")
 	router.HandleFunc(productsAdd, h.productsAdd).Methods("POST")
 
-	router.HandleFunc(productsChangeProductItem, hey).Methods("PATCH")
+	router.HandleFunc(productsChangeProductItem, h.productsChangeProductItem).Methods("PATCH")
 	router.HandleFunc(productsDeleteItem, h.productsDeleteItem).Methods("DELETE")
 	//router.HandleFunc(productsPriceStory, h.getProductsPriceStory).Methods("GET")
 
+	router.HandleFunc(productGetPicture, h.productGetPicture).Methods("GET")
 	router.HandleFunc(addPicture, h.addPicture).Methods("POST")
 	router.HandleFunc(productFindOne, h.productFindOne).Methods("GET")
 }
 
 func (h *handler) addPicture(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-
 	fmt.Println(id)
 	// Принимаем изображение
 	file, _, err := r.FormFile("file")
@@ -82,6 +83,29 @@ func (h *handler) addPicture(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	intId, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Print(errConv)
+	}
+
+	pr := Products{
+		Id:              intId,
+		ProductName:     "null",
+		Category:        -1,
+		QuantityOfGoods: -1,
+		LastPrice:       "null",
+		AvailableStatus: "null",
+		PictureAddress:  filePath,
+	}
+	fmt.Println(pr)
+	err = h.storage.ProductUpdateItem(context.TODO(), pr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 }
 
 func (h *handler) getProductsAll(w http.ResponseWriter, r *http.Request) {
@@ -99,53 +123,28 @@ func (h *handler) getProductsAll(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(js)
 	}
-
 }
 
 func (h *handler) productsAdd(w http.ResponseWriter, r *http.Request) {
 	var arrPr []Products
 	json.NewDecoder(r.Body).Decode(&arrPr)
 
-	/*
-		var t = decimal.NewFromInt(3)
-		pp := Products{
-			Id:              11,
-			ProductName:     "Слива",
-			Category:        34,
-			QuantityOfGoods: 33,
-			LastPrice:       t,
-			AvailableStatus: "good",
-			PictureAddress:  "/123",
-		}
-	*/
-	/*
-		var t = decimal.NewFromInt(3)
-		pp := Products{
-			Id:              11,
-			ProductName:     "njahsdjshjdahsad",
-			Category:        34,
-			QuantityOfGoods: 33,
-			LastPrice:       t,
-			AvailableStatus: "good",
-			PictureAddress:  "/123",
-		}
-	*/
 	err := h.storage.ProductsAddItems(context.TODO(), arrPr)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
+}
 
-	/*
+func (h *handler) productsChangeProductItem(w http.ResponseWriter, r *http.Request) {
+	var pr []Products
+	json.NewDecoder(r.Body).Decode(&pr)
 
-		//err := h.storage.ProductsAddItems(context.TODO(), arrPr)
-
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Print(err)
-		}
-		var text = "hey33" + err.Error()
-		io.WriteString(w, text)
-	*/
+	fmt.Println("json")
+	fmt.Println(pr[0])
+	err := h.storage.ProductUpdateItem(context.TODO(), pr[0])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 }
 
 func (h *handler) productsDeleteItem(w http.ResponseWriter, r *http.Request) {
@@ -179,12 +178,46 @@ func (h *handler) productFindOne(w http.ResponseWriter, r *http.Request) {
 
 	js, errJs := json.Marshal(pr)
 	if errJs != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
-	if errFind == nil && errJs == nil {
-		w.WriteHeader(http.StatusOK)
-		w.Write(js)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(js)
+
+}
+
+func (h *handler) productGetPicture(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	intId, errConv := strconv.Atoi(id)
+	if errConv != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Print(errConv)
 	}
+
+	pr, errFind := h.storage.ProductFindOne(context.TODO(), intId)
+	if errFind != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Print(errFind)
+	}
+
+	// картинка конец
+	file, err := os.Open(pr.PictureAddress)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	// Определение Content-Type и отправка картинки в ответ на запрос
+	fileInfo, _ := file.Stat()
+	fileSize := fileInfo.Size()
+	buffer := make([]byte, fileSize)
+	file.Read(buffer)
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", fileSize))
+	w.Write(buffer)
 }
 func hey(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "добрый вечер")
