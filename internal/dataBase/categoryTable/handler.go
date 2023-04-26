@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	catTAll    = "/products/all"
-	catTAdd    = "/products/add"
-	catTChange = "/products/changeProductItem"
-	catTDelete = "/products/delete"
+	catTAll    = "/catT/all"
+	catTAdd    = "/catT/add"
+	catTChange = "/catT/changeProductItem"
+	catTDelete = "/catT/delete"
 
 	catTFindOne = "/products/FindOne"
 )

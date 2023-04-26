@@ -1,4 +1,4 @@
-package categoryTable
+package categoryTableDb
 
 import (
 	"context"
@@ -44,7 +44,7 @@ func (d db) CategoryTableUpdateItem(ctx context.Context, cT categoryTable.Catego
 }
 
 func (d db) CategoryTableDeleteItem(ctx context.Context, id int) error {
-	q := fmt.Sprintf(`DELETE FROM "Products" WHERE id=%d`, id)
+	q := fmt.Sprintf(`DELETE FROM "CategoryTable" WHERE id=%d`, id)
 	_, err := d.client.ExecContext(ctx, q)
 
 	return err

@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/KatachiNo/Perr/internal/dataBase/categoryTable"
+	categoryTableDb "github.com/KatachiNo/Perr/internal/dataBase/categoryTable/db"
+	"github.com/KatachiNo/Perr/internal/dataBase/productPriceStory"
+	productPriceStoryDb "github.com/KatachiNo/Perr/internal/dataBase/productPriceStory/db"
 	"github.com/KatachiNo/Perr/internal/dataBase/products"
 	productsDb "github.com/KatachiNo/Perr/internal/dataBase/products/db"
 	"github.com/KatachiNo/Perr/internal/dataBase/user"
@@ -40,6 +44,16 @@ func main() {
 	st := productsDb.NewStorage(cli, l)
 	h := products.NewRegister(st, l)
 	h.Register(router)
+
+	l.Info("register categorytable handler")
+	st1 := categoryTableDb.NewStorage(cli, l)
+	hh := categoryTable.NewRegister(st1, l)
+	hh.Register(router)
+
+	l.Info("register ProductPriceStory handler")
+	st11 := productPriceStoryDb.NewStorage(cli, l)
+	hhh := productPriceStory.NewRegister(st11, l)
+	hhh.Register(router)
 
 	start(router, conf)
 }
