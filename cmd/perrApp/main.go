@@ -11,6 +11,7 @@ import (
 	"github.com/KatachiNo/Perr/internal/dataBase/products"
 	productsDb "github.com/KatachiNo/Perr/internal/dataBase/products/db"
 	"github.com/KatachiNo/Perr/internal/dataBase/user"
+	userDb "github.com/KatachiNo/Perr/internal/dataBase/user/db"
 	"github.com/KatachiNo/Perr/pkg/client/postgresql"
 	"net"
 	"net/http"
@@ -35,10 +36,6 @@ func main() {
 
 	conf := config.GetConfig()
 
-	l.Info("register user handler")
-	handler := user.NewRegister()
-	handler.Register(router)
-
 	cli, _ := postgresql.NewClient(context.TODO(), l, conf.PostgresDb)
 	l.Info("register products handler")
 	st := productsDb.NewStorage(cli, l)
@@ -54,6 +51,11 @@ func main() {
 	st11 := productPriceStoryDb.NewStorage(cli, l)
 	hhh := productPriceStory.NewRegister(st11, l)
 	hhh.Register(router)
+
+	l.Info("register Users handler")
+	st22 := userDb.NewStorage(cli, l)
+	hhhh := user.NewRegister(st22, l)
+	hhhh.Register(router)
 
 	start(router, conf)
 }

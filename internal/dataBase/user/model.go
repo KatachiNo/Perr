@@ -5,6 +5,7 @@ type User struct { //Users Table
 	Login              string `json:"login"`
 	CategoryOfUser     string `json:"category-of-user"`
 	DateOfRegistration string `json:"date-of-registration"`
+	Password           string `json:"password"`
 	PasswordHash       string `json:"-"`
 	Salt               string `json:"-"`
 	Algorithm          string `json:"-"`
