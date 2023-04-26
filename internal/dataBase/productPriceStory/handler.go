@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/KatachiNo/Perr/internal/Tokens"
 	"github.com/KatachiNo/Perr/internal/handlers"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
@@ -32,12 +33,12 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 }
 
 func (h *handler) Register(router *mux.Router) {
-	router.HandleFunc(ppsAll, h.ppsAll).Methods("GET")
-	router.HandleFunc(ppsAdd, h.ppsAdd).Methods("POST")
+	router.Handle(ppsAll, Tokens.CheckAuthorizedUser(h.ppsAll)).Methods("GET")
+	router.Handle(ppsAdd, Tokens.CheckAuthorizedAdmin(h.ppsAdd)).Methods("POST")
 
-	router.HandleFunc(ppsDelete, h.ppsDelete).Methods("DELETE")
+	router.Handle(ppsDelete, Tokens.CheckAuthorizedAdmin(h.ppsDelete)).Methods("DELETE")
 
-	router.HandleFunc(ppsFindOne, h.ppsFindOne).Methods("GET")
+	router.Handle(ppsFindOne, Tokens.CheckAuthorizedUser(h.ppsFindOne)).Methods("GET")
 }
 
 func (h *handler) ppsAll(w http.ResponseWriter, r *http.Request) {

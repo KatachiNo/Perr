@@ -10,3 +10,7 @@ type User struct { //Users Table
 	Salt               string `json:"-"`
 	Algorithm          string `json:"-"`
 }
+
+type Token struct {
+	TokenString string `json:"token"`
+}

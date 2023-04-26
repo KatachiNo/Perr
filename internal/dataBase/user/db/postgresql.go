@@ -17,22 +17,25 @@ type db struct {
 }
 
 func (d db) UserCreate(ctx context.Context, data user.User) error {
-	//TODO implement me
 	hash := sha512.New()
 	hash.Write([]byte(data.Password))
 
-	salt := make([]byte, 16)
+	salt := make([]byte, 128)
 	_, err := rand.Read(salt)
 	if err != nil {
 		return err
 	}
+	fmt.Println("salt user create", salt)
 
-	h := fmt.Sprintf("%x", hash.Sum(salt))
+	hash.Write(salt)
+	h := fmt.Sprintf("%x", hash.Sum(nil))
 	s := fmt.Sprintf("%x", salt)
+	fmt.Println("salt user create hex", s)
 
 	date := time.Now().Format("2006-01-02 15:04:05.000000")
-	q := fmt.Sprintf(`INSERT INTO "Users" (login, "passwordHash", "categoryOfUser", "dateOfRegistration", salt, algorithm) VALUES ('%s','%s','%s','%s','%s','%s')`,
-		data.Login, h, "0", date, s, "sha512")
+	q := fmt.Sprintf(`INSERT INTO "Users" (login, "passwordHash", "categoryOfUser", "dateOfRegistration", salt, algorithm)
+							 VALUES ('%s','%s','%s','%s','%s','%s')`,
+		data.Login, h, "1", date, s, "sha512")
 
 	fmt.Println(q)
 	_, err = d.client.ExecContext(ctx, q)
@@ -46,9 +49,8 @@ func (d db) UserCreate(ctx context.Context, data user.User) error {
 	return nil
 }
 
-func (d db) UserFind(ctx context.Context, id string) (user.User, error) {
-
-	q := fmt.Sprintf(`Select id, login, "passwordHash", "categoryOfUser", "dateOfRegistration", salt, algorithm from "Users" WHERE id=%d`, id)
+func (d db) UserFind(ctx context.Context, login string) (user.User, error) {
+	q := fmt.Sprintf(`Select id, login, "passwordHash", "categoryOfUser", "dateOfRegistration", salt, algorithm from "Users" WHERE login='%s'`, login)
 
 	row := d.client.QueryRowContext(ctx, q)
 	u := user.User{}
