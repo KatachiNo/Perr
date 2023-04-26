@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/KatachiNo/Perr/internal/dataBase/categoryTable"
 	categoryTableDb "github.com/KatachiNo/Perr/internal/dataBase/categoryTable/db"
+	"github.com/KatachiNo/Perr/internal/dataBase/orders"
+	ordersDb "github.com/KatachiNo/Perr/internal/dataBase/orders/db"
 	"github.com/KatachiNo/Perr/internal/dataBase/productPriceStory"
 	productPriceStoryDb "github.com/KatachiNo/Perr/internal/dataBase/productPriceStory/db"
 	"github.com/KatachiNo/Perr/internal/dataBase/products"
@@ -63,6 +65,11 @@ func main() {
 	st222 := UserDataDb.NewStorage(cli, l)
 	h1 := userData.NewRegister(st222, l)
 	h1.Register(router)
+
+	l.Info("register orders handler")
+	stt := ordersDb.NewStorage(cli, l)
+	h3 := orders.NewRegister(stt, l)
+	h3.Register(router)
 
 	start(router, conf)
 }

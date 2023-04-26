@@ -33,9 +33,9 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 
 func (h *handler) Register(router *mux.Router) {
 	router.Handle(userDAll, Tokens.CheckAuthorizedUser(h.userDAll)).Methods("GET")
-	router.Handle(userDAdd, Tokens.CheckAuthorizedAdmin(h.userDAdd)).Methods("POST")
+	router.Handle(userDAdd, Tokens.CheckAuthorizedUser(h.userDAdd)).Methods("POST")
 
-	router.Handle(userDDelete, Tokens.CheckAuthorizedAdmin(h.userDDelete)).Methods("DELETE")
+	router.Handle(userDDelete, Tokens.CheckAuthorizedUser(h.userDDelete)).Methods("DELETE")
 
 	router.Handle(userDFindOne, Tokens.CheckAuthorizedUser(h.userDFindOne)).Methods("GET")
 }
