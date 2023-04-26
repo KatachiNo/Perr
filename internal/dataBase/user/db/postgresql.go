@@ -44,12 +44,22 @@ func (d db) UserCreate(ctx context.Context, data user.User) error {
 	}
 
 	return nil
-
 }
 
 func (d db) UserFind(ctx context.Context, id string) (user.User, error) {
-	//TODO implement me
-	panic("implement me")
+
+	q := fmt.Sprintf(`Select id, login, "passwordHash", "categoryOfUser", "dateOfRegistration", salt, algorithm from "Users" WHERE id=%d`, id)
+
+	row := d.client.QueryRowContext(ctx, q)
+	u := user.User{}
+	err := row.Scan(&u.Id, &u.Login, &u.PasswordHash, &u.CategoryOfUser, &u.DateOfRegistration, &u.Salt, &u.Algorithm)
+
+	if err != nil {
+		return u, err
+	}
+
+	return u, nil
+
 }
 
 func (d db) UserUpdate(ctx context.Context, data user.User) error {
