@@ -76,12 +76,9 @@ func (h *handler) userAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("salt user auth saltTable", byteArraySalt)
-	fmt.Println("salt user auth saltTable hex", saltTable)
 
 	hashOp.Write(byteArraySalt)
 	ha := fmt.Sprintf("%x", hashOp.Sum(nil))
-	fmt.Println("ново сгенерированный хеш", ha)
 	if user.Login != u.Login || hashTable != ha {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -89,16 +86,16 @@ func (h *handler) userAuth(w http.ResponseWriter, r *http.Request) {
 
 	token, err := genJWT(u.CategoryOfUser)
 	if err != nil {
-		fmt.Println("jsss", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+
 	}
-	fmt.Println("tokennnnn", token)
 	tkn := Token{
 		TokenString: token,
 	}
 
 	jsTkn, errJs := json.Marshal(tkn)
 	if errJs != nil {
-		fmt.Println("jsonTokenError", errJs)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -113,7 +110,7 @@ func genJWT(categoryOfUser string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 
 	//claims["authorized"] = true
-	//claims["user"] = "VASYA221"
+	//claims["user"] = "Vlad"
 	claims["exp"] = time.Now().Add(time.Hour * 2160).Unix()
 
 	var tokenString string
@@ -129,7 +126,6 @@ func genJWT(categoryOfUser string) (string, error) {
 	if err != nil {
 		fmt.Errorf("Something went wrong: %s", err.Error())
 	}
-	fmt.Println("tokenString", tokenString)
 	return tokenString, nil
 }
 

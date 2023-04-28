@@ -22,8 +22,9 @@ type PostgresDb struct {
 	Port                     string `yaml:"port"`
 	Dbname                   string `yaml:"dbname"`
 	SSLMode                  string `yaml:"sslmode"`
-	Password                 string `yaml:"password" env:"PASSWORD" env-default:"1234"`
+	Password                 string `yaml:"password" env:"PASSWORD" env-default:"postgres"`
 	MaxAttemptsForConnection string `yaml:"max-attempts-for-connection" env-default:"10"`
+	MakeStartTables          string `yaml:"make-start-tables" env-default:"false"`
 }
 
 var instance *Config
