@@ -201,7 +201,20 @@ func generatePassword(length int) string {
 }
 func makeTables(client postgresql.Client, conf *config.Config) {
 	l := logg.GetLogger()
-	q := `create table "Products"
+
+	if conf.MakeStartTables == "true" {
+		_, err := client.ExecContext(context.TODO(), SqlReq)
+		if err != nil {
+			//l.Error(resp)
+			l.Error(err)
+		}
+		l.Info("Tables have made successful")
+	}
+
+}
+
+const SqlReq = `
+create table "Products"
 (
     category          integer not null,
     picture_address   varchar(100),
@@ -229,7 +242,7 @@ create table "CategoryTable"
 (
     categoryid   serial
         unique,
-    categoryname char(100) not null,
+    categoryname varchar(100) not null,
     id           serial
         constraint "CategoryTable_pk"
             primary key
@@ -312,14 +325,5 @@ comment on column "Orders".ordered_products_ids is 'ids of products which was or
 
 alter table "Orders"
     owner to postgres;
-`
-	if conf.MakeStartTables == "true" {
-		_, err := client.ExecContext(context.TODO(), q)
-		if err != nil {
-			//l.Error(resp)
-			l.Error(err)
-		}
-		l.Info("Tables have made successful")
-	}
 
-}
+`
