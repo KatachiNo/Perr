@@ -16,6 +16,7 @@ type db struct {
 	l      *logg.Logger
 }
 
+// изменена функция
 func (d db) UserCreate(ctx context.Context, data user.User) error {
 	hash := sha512.New()
 	hash.Write([]byte(data.Password))
@@ -25,19 +26,16 @@ func (d db) UserCreate(ctx context.Context, data user.User) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("salt user create", salt)
 
 	hash.Write(salt)
 	h := fmt.Sprintf("%x", hash.Sum(nil))
 	s := fmt.Sprintf("%x", salt)
-	fmt.Println("salt user create hex", s)
 
 	date := time.Now().Format("2006-01-02 15:04:05.000000")
 	q := fmt.Sprintf(`INSERT INTO "Users" (login, "passwordHash", "categoryOfUser", "dateOfRegistration", salt, algorithm)
 							 VALUES ('%s','%s','%s','%s','%s','%s')`,
 		data.Login, h, "1", date, s, "sha512")
 
-	fmt.Println(q)
 	_, err = d.client.ExecContext(ctx, q)
 
 	if err != nil {

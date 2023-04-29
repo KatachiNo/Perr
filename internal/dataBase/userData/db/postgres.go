@@ -15,14 +15,13 @@ type db struct {
 
 func (d db) UserDataAdd(ctx context.Context, arrUserData []userData.UserData) error {
 	for _, uD := range arrUserData {
-		q := fmt.Sprintf(`INSERT INTO "UserData" (email,phone_number,country,city,index,street,number_house,note,first_name,middle_name,last_name)
-VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',)`, uD.Email, uD.PhoneNumber, uD.Country, uD.City, uD.Index, uD.Street, uD.NumberHouse, uD.Note, uD.FirstName, uD.MiddleName, uD.LastName)
-		fmt.Println(q)
+		q := fmt.Sprintf(`INSERT INTO "UserData" (id,email,phone_number,country,city,index,street,number_house,note,first_name,middle_name,last_name)
+VALUES ('%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, uD.Id, uD.Email, uD.PhoneNumber, uD.Country, uD.City, uD.Index, uD.Street, uD.NumberHouse, uD.Note, uD.FirstName, uD.MiddleName, uD.LastName)
 		_, err := d.client.ExecContext(ctx, q)
 
 		if err != nil {
-			fmt.Print("ошибка")
-			fmt.Print(err)
+			d.l.Error(err)
+			d.l.Error(q)
 			return err
 		}
 	}
@@ -75,7 +74,7 @@ func (d db) UserDataGetAll(ctx context.Context) ([]userData.UserData, error) {
 }
 
 func (d db) UserDataDelete(ctx context.Context, id string) error {
-	q := fmt.Sprintf(`DELETE FROM "UserData" WHERE id=%d`, id)
+	q := fmt.Sprintf(`DELETE FROM "UserData" WHERE id=%s`, id)
 	_, err := d.client.ExecContext(ctx, q)
 
 	return err

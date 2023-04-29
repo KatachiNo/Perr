@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/sha512"
 	"errors"
 	"fmt"
 	"github.com/KatachiNo/Perr/internal/dataBase/categoryTable"
@@ -17,6 +18,7 @@ import (
 	"github.com/KatachiNo/Perr/internal/dataBase/userData"
 	UserDataDb "github.com/KatachiNo/Perr/internal/dataBase/userData/db"
 	"github.com/KatachiNo/Perr/pkg/client/postgresql"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -49,7 +51,7 @@ func beforeStart(router *mux.Router, conf *config.Config) {
 
 	l.Info("MakeTables(if they don't exist)")
 	makeTables(cli, conf)
-
+	makeAdmins(cli, conf)
 	l.Info("register products handler")
 	st1 := productsDb.NewStorage(cli, l)
 	h1 := products.NewRegister(st1, l)
@@ -146,6 +148,57 @@ func getListener(conf *config.Config) (net.Listener, error) {
 	return listener, listenErr
 }
 
+// изменено
+func makeAdmins(client postgresql.Client, conf *config.Config) {
+	if conf.MakeStartAdmin == "true" {
+		l := logg.GetLogger()
+		l.Info("Try to make admin")
+		pswd := generatePassword(14)
+		u := user.User{
+			Login:          "adminStart",
+			CategoryOfUser: "0",
+			Password:       pswd,
+		}
+
+		hash := sha512.New()
+		hash.Write([]byte(u.Password))
+
+		salt := make([]byte, 128)
+		_, err := rand.Read(salt)
+		if err != nil {
+			l.Fatal(err)
+		}
+
+		hash.Write(salt)
+		h := fmt.Sprintf("%x", hash.Sum(nil))
+		s := fmt.Sprintf("%x", salt)
+
+		date := time.Now().Format("2006-01-02 15:04:05.000000")
+		q := fmt.Sprintf(`INSERT INTO "Users" (login, "passwordHash", "categoryOfUser", "dateOfRegistration", salt, algorithm)
+							 VALUES ('%s','%s','%s','%s','%s','%s')`,
+			u.Login, h, u.CategoryOfUser, date, s, "sha512")
+
+		_, err = client.ExecContext(context.TODO(), q)
+		if err != nil {
+			l.Error(err)
+		} else {
+			text := fmt.Sprintf("Ваш логин %s  // ваш пароль %s", u.Login, u.Password)
+			l.Info(text)
+		}
+
+	}
+
+}
+
+// изменено
+func generatePassword(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	password := make([]byte, length)
+	for i := range password {
+		password[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(password)
+}
 func makeTables(client postgresql.Client, conf *config.Config) {
 	l := logg.GetLogger()
 	q := `create table "Products"
@@ -153,7 +206,8 @@ func makeTables(client postgresql.Client, conf *config.Config) {
     category          integer not null,
     picture_address   varchar(100),
     id                serial
-        primary key,
+        primary key
+        unique,
     quantity_of_goods integer not null,
     last_price        numeric,
     product_name      varchar(100),
@@ -173,7 +227,7 @@ alter table "Products"
 
 create table "CategoryTable"
 (
-    categoryid   integer   not null
+    categoryid   serial
         unique,
     categoryname char(100) not null,
     id           serial
@@ -186,11 +240,10 @@ alter table "CategoryTable"
 
 create table "ProductPriceStory"
 (
-    id      integer   not null
+    id      serial
         constraint "ProductPrice_pkey"
             primary key
-        constraint productpricestory_products_id_fk
-            references "Products",
+        unique,
     "Price" numeric   not null,
     "Date"  timestamp not null
 );
@@ -202,7 +255,8 @@ create table "Users"
 (
     id                   serial
         constraint "Logins_pk"
-            primary key,
+            primary key
+        unique,
     login                varchar(100)  not null
         unique,
     "passwordHash"       varchar(1000) not null,
@@ -217,11 +271,10 @@ alter table "Users"
 
 create table "UserData"
 (
-    id           integer not null
+    id           serial
         constraint id
             primary key
-        constraint userdata_logins_id_fk
-            references "Users",
+        unique,
     email        varchar(50),
     phone_number varchar(30),
     country      varchar(30),

@@ -15,17 +15,16 @@ import (
 	"strconv"
 )
 
+// изменено
 const (
 	productsAll               = "/products/all"
 	productsAdd               = "/products/add"
 	productsChangeProductItem = "/products/changeProductItem"
 	productsDeleteItem        = "/products/delete"
-	//productsPriceStory        = "/products/PriceStory"
-	productFindOne    = "/products/FindOne"
-	productGetPicture = "/products/GetPicture"
+	productFindOne            = "/products/FindOne"
+	productGetPicture         = "/products/GetPicture"
 
 	addPicture = "/products/addPicture"
-	testHey    = "/test"
 )
 
 type handler struct {
@@ -40,16 +39,14 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 	}
 }
 
+// изменено
 func (h *handler) Register(router *mux.Router) {
-
-	router.HandleFunc(testHey, hey).Methods("GET")
 
 	router.Handle(productsAll, Tokens.CheckAuthorizedUser(h.getProductsAll)).Methods("GET")
 	router.Handle(productsAdd, Tokens.CheckAuthorizedAdmin(h.productsAdd)).Methods("POST")
 
 	router.Handle(productsChangeProductItem, Tokens.CheckAuthorizedAdmin(h.productsChangeProductItem)).Methods("PATCH")
 	router.Handle(productsDeleteItem, Tokens.CheckAuthorizedAdmin(h.productsDeleteItem)).Methods("DELETE")
-	//router.HandleFunc(productsPriceStory, h.getProductsPriceStory).Methods("GET")
 
 	router.Handle(productGetPicture, Tokens.CheckAuthorizedUser(h.productGetPicture)).Methods("GET")
 	router.Handle(addPicture, Tokens.CheckAuthorizedAdmin(h.addPicture)).Methods("POST")
@@ -134,6 +131,7 @@ func (h *handler) productsAdd(w http.ResponseWriter, r *http.Request) {
 	err := h.storage.ProductsAddItems(context.TODO(), arrPr)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(err)
 	}
 }
 
@@ -146,6 +144,7 @@ func (h *handler) productsChangeProductItem(w http.ResponseWriter, r *http.Reque
 	err := h.storage.ProductUpdateItem(context.TODO(), pr[0])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(err)
 	}
 }
 
@@ -154,13 +153,14 @@ func (h *handler) productsDeleteItem(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+
+		h.l.Error(errConv)
 	}
 
 	errDel := h.storage.ProductDeleteItem(context.TODO(), intId)
 	if errDel != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errDel)
+		h.l.Error(errDel)
 	}
 }
 
@@ -169,18 +169,19 @@ func (h *handler) productFindOne(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	pr, errFind := h.storage.ProductFindOne(context.TODO(), intId)
 	if errFind != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errFind)
+		h.l.Error(errFind)
 	}
 
 	js, errJs := json.Marshal(pr)
 	if errJs != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(errJs)
 		return
 	}
 
@@ -194,20 +195,20 @@ func (h *handler) productGetPicture(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	pr, errFind := h.storage.ProductFindOne(context.TODO(), intId)
 	if errFind != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errFind)
+		h.l.Error(errFind)
 	}
 
 	// картинка конец
-	file, err := os.Open(pr.PictureAddress)
+	file, err := os.Open("pictureFiles" + pr.PictureAddress)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println(err)
+		h.l.Error(err)
 		return
 	}
 	defer file.Close()
@@ -220,7 +221,4 @@ func (h *handler) productGetPicture(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", fileSize))
 	w.Write(buffer)
-}
-func hey(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "добрый вечер")
 }

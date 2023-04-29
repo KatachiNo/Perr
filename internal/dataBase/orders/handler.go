@@ -69,13 +69,13 @@ func (h *handler) orderTDelete(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	errDel := h.storage.OrderDelete(context.TODO(), intId)
 	if errDel != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errDel)
+		h.l.Error(errDel)
 	}
 }
 
@@ -84,18 +84,19 @@ func (h *handler) orderTFindOne(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	cT, errFind := h.storage.OrderFindOne(context.TODO(), intId)
 	if errFind != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errFind)
+		h.l.Error(errFind)
 	}
 
 	js, errJs := json.Marshal(cT)
 	if errJs != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(errJs)
 		return
 	}
 
@@ -110,5 +111,6 @@ func (h *handler) orderTCreate(w http.ResponseWriter, r *http.Request) {
 	err := h.storage.CreateOrder(context.TODO(), order)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(err)
 	}
 }

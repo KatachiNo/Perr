@@ -3,7 +3,6 @@ package productPriceStory
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/KatachiNo/Perr/internal/Tokens"
 	"github.com/KatachiNo/Perr/internal/handlers"
 	"github.com/KatachiNo/Perr/pkg/logg"
@@ -65,6 +64,7 @@ func (h *handler) ppsAdd(w http.ResponseWriter, r *http.Request) {
 	err := h.storage.ProductPriceAddItems(context.TODO(), arrPr)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(err)
 	}
 }
 
@@ -73,13 +73,13 @@ func (h *handler) ppsDelete(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	errDel := h.storage.ProductPriceTableDeleteItem(context.TODO(), intId)
 	if errDel != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errDel)
+		h.l.Error(errDel)
 	}
 }
 
@@ -88,18 +88,19 @@ func (h *handler) ppsFindOne(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	cT, errFind := h.storage.ProductPriceTableFindOne(context.TODO(), intId)
 	if errFind != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errFind)
+		h.l.Error(errFind)
 	}
 
 	js, errJs := json.Marshal(cT)
 	if errJs != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(errJs)
 		return
 	}
 

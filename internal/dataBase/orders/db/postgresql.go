@@ -15,18 +15,20 @@ type db struct {
 }
 
 func (d db) CreateOrder(ctx context.Context, order orders.Orders) error {
-
-	orderedIds := fmt.Sprintf("{%s}", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(order.OrderedProductsIds)), ","), "[]"))
+	a := strings.Replace(order.OrderedProductsIds, ",", " ", -1)
+	arr := strings.FieldsFunc(a, func(r rune) bool {
+		return r == ' '
+	})
+	orderedIds := "{" + strings.Join(arr, ",") + "}"
 
 	q := fmt.Sprintf(`INSERT INTO "Orders" (user_id, data_of_order, ordered_products_ids, final_price, delivery_status)
 VALUES ('%d','%s','%s','%s','%s')`, order.UserId, order.DataOfOrder, orderedIds,
 		order.FinalPrice, "Заказ создан")
-	fmt.Println(q)
 	_, err := d.client.ExecContext(ctx, q)
 
 	if err != nil {
-		fmt.Print("ошибка")
-		fmt.Print(err)
+		d.l.Error(err)
+		d.l.Error(q)
 		return err
 	}
 
@@ -39,14 +41,14 @@ func (d db) ChangeOrder(ctx context.Context, order orders.Orders) error {
 }
 
 func (d db) OrderDelete(ctx context.Context, orderId int) error {
-	q := fmt.Sprintf(`DELETE FROM "Orders" WHERE id=%d`, orderId)
+	q := fmt.Sprintf(`DELETE FROM "Orders" WHERE "orderId"=%d`, orderId)
 	_, err := d.client.ExecContext(ctx, q)
 
 	return err
 }
 
 func (d db) OrderFindOne(ctx context.Context, id int) (orders.Orders, error) {
-	q := fmt.Sprintf(`SELECT "orderId", user_id, data_of_order, ordered_products_ids, final_price, delivery_status FROM "Orders" WHERE id=%d`, id)
+	q := fmt.Sprintf(`SELECT "orderId", user_id, data_of_order, ordered_products_ids, final_price, delivery_status FROM "Orders" WHERE "orderId"=%d`, id)
 
 	row := d.client.QueryRowContext(ctx, q)
 	ord := orders.Orders{}

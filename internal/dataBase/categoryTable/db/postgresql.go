@@ -20,8 +20,8 @@ func (d db) CategoryTableAddItems(ctx context.Context, arrCT []categoryTable.Cat
 		_, err := d.client.ExecContext(ctx, q)
 
 		if err != nil {
-			fmt.Print("ошибка")
-			fmt.Print(err)
+			d.l.Error(err)
+			d.l.Error(q)
 			return err
 		}
 	}
@@ -31,12 +31,11 @@ func (d db) CategoryTableAddItems(ctx context.Context, arrCT []categoryTable.Cat
 func (d db) CategoryTableUpdateItem(ctx context.Context, cT categoryTable.CategoryTable) error {
 	q := fmt.Sprintf(`UPDATE "CategoryTable" SET categoryname='%s' WHERE id=%d`, cT.CategoryName, cT.Id)
 
-	fmt.Println(q)
 	_, err := d.client.ExecContext(ctx, q)
 
 	if err != nil {
-		fmt.Print("ошибка")
-		fmt.Print(err)
+		d.l.Error(err)
+		d.l.Error(q)
 		return err
 	}
 
@@ -69,6 +68,8 @@ func (d db) CategoryTableGetAll(ctx context.Context) ([]categoryTable.CategoryTa
 	rows, err := d.client.QueryContext(ctx, q)
 
 	if err != nil {
+		d.l.Error(err)
+		d.l.Error(q)
 		return nil, err
 	}
 

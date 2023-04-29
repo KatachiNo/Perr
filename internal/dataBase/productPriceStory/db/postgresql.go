@@ -15,13 +15,12 @@ type db struct {
 
 func (d db) ProductPriceAddItems(ctx context.Context, arrPPS []productPriceStory.ProductPriceStoryTable) error {
 	for _, ppS := range arrPPS {
-		q := fmt.Sprintf(`INSERT INTO "ProductPriceStory" ("Price", "Date") VALUES ('%s','%s')`, ppS.Price, ppS.Date)
-		fmt.Println(q)
+		q := fmt.Sprintf(`INSERT INTO "ProductPriceStory" ("id","Price", "Date") VALUES ('%d','%s','%s')`, ppS.Id, ppS.Price, ppS.Date)
 		_, err := d.client.ExecContext(ctx, q)
-
+		d.l.Info(q)
 		if err != nil {
-			fmt.Print("ошибка")
-			fmt.Print(err)
+			d.l.Error(err)
+			d.l.Error(q)
 			return err
 		}
 	}
@@ -53,7 +52,8 @@ func (d db) ProductPriceTableGetAll(ctx context.Context) ([]productPriceStory.Pr
 	rows, err := d.client.QueryContext(ctx, q)
 
 	if err != nil {
-		fmt.Print(err)
+		d.l.Error(err)
+		d.l.Error(q)
 		return nil, err
 	}
 

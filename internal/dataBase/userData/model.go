@@ -1,7 +1,7 @@
 package userData
 
 type UserData struct { //Users Table
-	Id          string `json:"id"`
+	Id          int    `json:"id"`
 	Email       string `json:"email"`
 	PhoneNumber string `json:"phone-number"`
 	Country     string `json:"country"`

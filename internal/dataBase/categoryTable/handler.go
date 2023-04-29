@@ -18,7 +18,7 @@ const (
 	catTChange = "/catT/changeProductItem"
 	catTDelete = "/catT/delete"
 
-	catTFindOne = "/products/FindOne"
+	catTFindOne = "/catT/FindOne"
 )
 
 type handler struct {
@@ -40,7 +40,7 @@ func (h *handler) Register(router *mux.Router) {
 	router.Handle(catTChange, Tokens.CheckAuthorizedAdmin(h.catTChange)).Methods("PATCH")
 	router.Handle(catTDelete, Tokens.CheckAuthorizedAdmin(h.catTDelete)).Methods("DELETE")
 
-	router.Handle(catTFindOne, Tokens.CheckAuthorizedAdmin(h.catTFindOne)).Methods("GET")
+	router.Handle(catTFindOne, Tokens.CheckAuthorizedUser(h.catTFindOne)).Methods("GET")
 }
 
 func (h *handler) catTAll(w http.ResponseWriter, r *http.Request) {
@@ -65,18 +65,19 @@ func (h *handler) catTFindOne(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	cT, errFind := h.storage.CategoryTableFindOne(context.TODO(), intId)
 	if errFind != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errFind)
+		h.l.Error(errFind)
 	}
 
 	js, errJs := json.Marshal(cT)
 	if errJs != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		h.l.Error(errJs)
 		return
 	}
 
@@ -89,13 +90,13 @@ func (h *handler) catTDelete(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	errDel := h.storage.CategoryTableDeleteItem(context.TODO(), intId)
 	if errDel != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errDel)
+		h.l.Error(errDel)
 	}
 }
 
