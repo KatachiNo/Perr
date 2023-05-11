@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/KatachiNo/Perr/internal/Tokens"
 	"github.com/KatachiNo/Perr/internal/handlers"
+	"github.com/KatachiNo/Perr/internal/tokens"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
 	"io"
@@ -42,15 +42,15 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 // изменено
 func (h *handler) Register(router *mux.Router) {
 
-	router.Handle(productsAll, Tokens.CheckAuthorizedUser(h.getProductsAll)).Methods("GET")
-	router.Handle(productsAdd, Tokens.CheckAuthorizedAdmin(h.productsAdd)).Methods("POST")
+	router.Handle(productsAll, tokens.CheckAuthorizedUser(h.getProductsAll)).Methods("GET")
+	router.Handle(productsAdd, tokens.CheckAuthorizedAdmin(h.productsAdd)).Methods("POST")
 
-	router.Handle(productsChangeProductItem, Tokens.CheckAuthorizedAdmin(h.productsChangeProductItem)).Methods("PATCH")
-	router.Handle(productsDeleteItem, Tokens.CheckAuthorizedAdmin(h.productsDeleteItem)).Methods("DELETE")
+	router.Handle(productsChangeProductItem, tokens.CheckAuthorizedAdmin(h.productsChangeProductItem)).Methods("PATCH")
+	router.Handle(productsDeleteItem, tokens.CheckAuthorizedAdmin(h.productsDeleteItem)).Methods("DELETE")
 
-	router.Handle(productGetPicture, Tokens.CheckAuthorizedUser(h.productGetPicture)).Methods("GET")
-	router.Handle(addPicture, Tokens.CheckAuthorizedAdmin(h.addPicture)).Methods("POST")
-	router.Handle(productFindOne, Tokens.CheckAuthorizedUser(h.productFindOne)).Methods("GET")
+	router.Handle(productGetPicture, tokens.CheckAuthorizedUser(h.productGetPicture)).Methods("GET")
+	router.Handle(addPicture, tokens.CheckAuthorizedAdmin(h.addPicture)).Methods("POST")
+	router.Handle(productFindOne, tokens.CheckAuthorizedUser(h.productFindOne)).Methods("GET")
 }
 
 func (h *handler) addPicture(w http.ResponseWriter, r *http.Request) {

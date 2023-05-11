@@ -21,10 +21,9 @@ func NewClient(ctx context.Context, l *logg.Logger, conf config.PostgresDb) (db 
 
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		conf.Host, conf.Port, conf.Username, conf.Password, conf.Dbname)
-	//fmt.Print(connStr)
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
-		fmt.Print(err)
+		l.Error(err)
 		return nil, err
 	}
 

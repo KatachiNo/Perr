@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  perrApp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: perrApp
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - dataBaseNetwork
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks:
+      - main
+    restart: always
+
+networks:
+  main:
+    driver: bridge
+
+volumes:
+  data:

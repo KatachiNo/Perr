@@ -1,4 +1,4 @@
-package Tokens
+package tokens
 
 import (
 	"fmt"
@@ -19,8 +19,11 @@ func CheckAuthorizedAdmin(endpoint func(http.ResponseWriter, *http.Request)) htt
 		authHeader := r.Header.Get("Authorization")
 		if authHeader != "" {
 			bearerToken := strings.Split(authHeader, " ")
+
 			if len(bearerToken) == 2 && bearerToken[0] == "Bearer" {
+
 				token, err := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
+
 					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 						return nil, fmt.Errorf("There was an error")
 					}

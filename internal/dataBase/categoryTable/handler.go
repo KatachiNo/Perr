@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/KatachiNo/Perr/internal/Tokens"
 	"github.com/KatachiNo/Perr/internal/handlers"
+	"github.com/KatachiNo/Perr/internal/tokens"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -13,11 +13,10 @@ import (
 )
 
 const (
-	catTAll    = "/catT/all"
-	catTAdd    = "/catT/add"
-	catTChange = "/catT/changeProductItem"
-	catTDelete = "/catT/delete"
-
+	catTAll     = "/catT/all"
+	catTAdd     = "/catT/add"
+	catTChange  = "/catT/changeProductItem"
+	catTDelete  = "/catT/delete"
 	catTFindOne = "/catT/FindOne"
 )
 
@@ -34,13 +33,13 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 }
 
 func (h *handler) Register(router *mux.Router) {
-	router.Handle(catTAll, Tokens.CheckAuthorizedUser(h.catTAll)).Methods("GET")
-	router.Handle(catTAdd, Tokens.CheckAuthorizedAdmin(h.catTAdd)).Methods("POST")
+	go router.Handle(catTAll, tokens.CheckAuthorizedUser(h.catTAll)).Methods("GET")
+	router.Handle(catTAdd, tokens.CheckAuthorizedAdmin(h.catTAdd)).Methods("POST")
 
-	router.Handle(catTChange, Tokens.CheckAuthorizedAdmin(h.catTChange)).Methods("PATCH")
-	router.Handle(catTDelete, Tokens.CheckAuthorizedAdmin(h.catTDelete)).Methods("DELETE")
+	router.Handle(catTChange, tokens.CheckAuthorizedAdmin(h.catTChange)).Methods("PATCH")
+	router.Handle(catTDelete, tokens.CheckAuthorizedAdmin(h.catTDelete)).Methods("DELETE")
 
-	router.Handle(catTFindOne, Tokens.CheckAuthorizedUser(h.catTFindOne)).Methods("GET")
+	go router.Handle(catTFindOne, tokens.CheckAuthorizedUser(h.catTFindOne)).Methods("GET")
 }
 
 func (h *handler) catTAll(w http.ResponseWriter, r *http.Request) {

@@ -6,8 +6,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/KatachiNo/Perr/internal/Tokens"
 	"github.com/KatachiNo/Perr/internal/handlers"
+	"github.com/KatachiNo/Perr/internal/tokens"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
@@ -39,8 +39,8 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc(userReg, h.userReg).Methods("POST")
 	router.HandleFunc(userAuth, h.userAuth).Methods("POST")
-	router.Handle(userChange, Tokens.CheckAuthorizedAdmin(h.userChange)).Methods("GET")
-	router.Handle(userDelete, Tokens.CheckAuthorizedAdmin(h.userDelete)).Methods("GET")
+	go router.Handle(userChange, tokens.CheckAuthorizedAdmin(h.userChange)).Methods("GET")
+	go router.Handle(userDelete, tokens.CheckAuthorizedAdmin(h.userDelete)).Methods("GET")
 
 }
 
@@ -116,10 +116,10 @@ func genJWT(categoryOfUser string) (string, error) {
 	var tokenString string
 	var err error
 	if categoryOfUser == "0" {
-		tokenString, err = token.SignedString(Tokens.MySigningKeyAdmin)
+		tokenString, err = token.SignedString(tokens.MySigningKeyAdmin)
 
 	} else {
-		tokenString, err = token.SignedString(Tokens.MySigningKeyUser)
+		tokenString, err = token.SignedString(tokens.MySigningKeyUser)
 
 	}
 

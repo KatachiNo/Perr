@@ -51,8 +51,8 @@ func beforeStart(router *mux.Router, conf *config.Config) {
 	cli, _ := postgresql.NewClient(context.TODO(), l, conf.PostgresDb)
 
 	l.Info("MakeTables(if they don't exist)")
-	makeTables(cli, conf)
-	makeAdmins(cli, conf)
+	go makeTables(cli, conf)
+	go makeAdmins(cli, conf)
 	l.Info("register products handler")
 	st1 := productsDb.NewStorage(cli, l)
 	h1 := products.NewRegister(st1, l)
@@ -94,10 +94,11 @@ func start(router *mux.Router, conf *config.Config) {
 	}
 
 	serv := &http.Server{
-		Addr:         ":8080",
-		Handler:      router,
-		WriteTimeout: 1 * time.Second,
-		ReadTimeout:  1 * time.Second,
+		Addr:           ":8080",
+		Handler:        router,
+		MaxHeaderBytes: 1 << 20,
+		WriteTimeout:   10 * time.Second,
+		ReadTimeout:    10 * time.Second,
 	}
 
 	err = serv.Serve(listener)
@@ -105,7 +106,7 @@ func start(router *mux.Router, conf *config.Config) {
 		l.Fatal(err)
 	}
 
-	l.Info("application is started")
+	l.Info("server part is started")
 
 }
 
@@ -216,7 +217,7 @@ func makeTables(client postgresql.Client, conf *config.Config) {
 	}
 
 	if conf.MakeStartTables == "true" {
-		_, err := client.ExecContext(context.TODO(), sqlReq)
+		_, err = client.ExecContext(context.TODO(), sqlReq)
 		if err != nil {
 			l.Error(err)
 		}
