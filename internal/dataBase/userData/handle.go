@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/KatachiNo/Perr/internal/authCheck"
 	"github.com/KatachiNo/Perr/internal/handlers"
-	"github.com/KatachiNo/Perr/internal/tokens"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -32,10 +32,10 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 }
 
 func (h *handler) Register(router *mux.Router) {
-	go router.Handle(userDAll, tokens.CheckAuthorizedUser(h.userDAll)).Methods("GET")
-	router.Handle(userDAdd, tokens.CheckAuthorizedAdmin(h.userDAdd)).Methods("POST")
-	router.Handle(userDDelete, tokens.CheckAuthorizedAdmin(h.userDDelete)).Methods("DELETE")
-	go router.Handle(userDFindOne, tokens.CheckAuthorizedUser(h.userDFindOne)).Methods("GET")
+	go router.Handle(userDAll, authCheck.UserAndAdmin(h.userDAll)).Methods("GET")
+	router.Handle(userDAdd, authCheck.Admin(h.userDAdd)).Methods("POST")
+	router.Handle(userDDelete, authCheck.Admin(h.userDDelete)).Methods("DELETE")
+	go router.Handle(userDFindOne, authCheck.UserAndAdmin(h.userDFindOne)).Methods("GET")
 }
 
 func (h *handler) userDAll(w http.ResponseWriter, r *http.Request) {

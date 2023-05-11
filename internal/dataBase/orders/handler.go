@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/KatachiNo/Perr/internal/authCheck"
 	"github.com/KatachiNo/Perr/internal/handlers"
-	"github.com/KatachiNo/Perr/internal/tokens"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -34,13 +34,13 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 }
 
 func (h *handler) Register(router *mux.Router) {
-	go router.Handle(orderTAll, tokens.CheckAuthorizedAdmin(h.orderTAll)).Methods("GET")
-	router.Handle(orderTCreate, tokens.CheckAuthorizedUser(h.orderTCreate)).Methods("POST")
+	go router.Handle(orderTAll, authCheck.Admin(h.orderTAll)).Methods("GET")
+	router.Handle(orderTCreate, authCheck.UserAndAdmin(h.orderTCreate)).Methods("POST")
 
-	//router.Handle(catTChange, tokens.CheckAuthorizedAdmin(h.catTChange)).Methods("PATCH")
-	router.Handle(orderTDelete, tokens.CheckAuthorizedAdmin(h.orderTDelete)).Methods("DELETE")
+	//router.Handle(catTChange, tokens.Admin(h.catTChange)).Methods("PATCH")
+	router.Handle(orderTDelete, authCheck.Admin(h.orderTDelete)).Methods("DELETE")
 
-	go router.Handle(orderTFindOne, tokens.CheckAuthorizedAdmin(h.orderTFindOne)).Methods("GET")
+	go router.Handle(orderTFindOne, authCheck.Admin(h.orderTFindOne)).Methods("GET")
 }
 
 func (h *handler) orderTAll(w http.ResponseWriter, r *http.Request) {

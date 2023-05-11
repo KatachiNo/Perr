@@ -3,8 +3,8 @@ package productPriceStory
 import (
 	"context"
 	"encoding/json"
+	"github.com/KatachiNo/Perr/internal/authCheck"
 	"github.com/KatachiNo/Perr/internal/handlers"
-	"github.com/KatachiNo/Perr/internal/tokens"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -32,12 +32,12 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 }
 
 func (h *handler) Register(router *mux.Router) {
-	go router.Handle(ppsAll, tokens.CheckAuthorizedUser(h.ppsAll)).Methods("GET")
-	router.Handle(ppsAdd, tokens.CheckAuthorizedAdmin(h.ppsAdd)).Methods("POST")
+	go router.Handle(ppsAll, authCheck.UserAndAdmin(h.ppsAll)).Methods("GET")
+	router.Handle(ppsAdd, authCheck.Admin(h.ppsAdd)).Methods("POST")
 
-	router.Handle(ppsDelete, tokens.CheckAuthorizedAdmin(h.ppsDelete)).Methods("DELETE")
+	router.Handle(ppsDelete, authCheck.Admin(h.ppsDelete)).Methods("DELETE")
 
-	go router.Handle(ppsFindOne, tokens.CheckAuthorizedUser(h.ppsFindOne)).Methods("GET")
+	go router.Handle(ppsFindOne, authCheck.UserAndAdmin(h.ppsFindOne)).Methods("GET")
 }
 
 func (h *handler) ppsAll(w http.ResponseWriter, r *http.Request) {

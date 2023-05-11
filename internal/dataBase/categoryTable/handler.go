@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/KatachiNo/Perr/internal/authCheck"
 	"github.com/KatachiNo/Perr/internal/handlers"
-	"github.com/KatachiNo/Perr/internal/tokens"
 	"github.com/KatachiNo/Perr/pkg/logg"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -33,13 +33,13 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 }
 
 func (h *handler) Register(router *mux.Router) {
-	go router.Handle(catTAll, tokens.CheckAuthorizedUser(h.catTAll)).Methods("GET")
-	router.Handle(catTAdd, tokens.CheckAuthorizedAdmin(h.catTAdd)).Methods("POST")
+	go router.Handle(catTAll, authCheck.UserAndAdmin(h.catTAll)).Methods("GET")
+	router.Handle(catTAdd, authCheck.Admin(h.catTAdd)).Methods("POST")
 
-	router.Handle(catTChange, tokens.CheckAuthorizedAdmin(h.catTChange)).Methods("PATCH")
-	router.Handle(catTDelete, tokens.CheckAuthorizedAdmin(h.catTDelete)).Methods("DELETE")
+	router.Handle(catTChange, authCheck.Admin(h.catTChange)).Methods("PATCH")
+	router.Handle(catTDelete, authCheck.Admin(h.catTDelete)).Methods("DELETE")
 
-	go router.Handle(catTFindOne, tokens.CheckAuthorizedUser(h.catTFindOne)).Methods("GET")
+	go router.Handle(catTFindOne, authCheck.UserAndAdmin(h.catTFindOne)).Methods("GET")
 }
 
 func (h *handler) catTAll(w http.ResponseWriter, r *http.Request) {

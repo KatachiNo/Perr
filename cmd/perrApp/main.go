@@ -220,6 +220,7 @@ func makeTables(client postgresql.Client, conf *config.Config) {
 		_, err = client.ExecContext(context.TODO(), sqlReq)
 		if err != nil {
 			l.Error(err)
+			return
 		}
 		l.Info("Tables have made successful")
 	}
