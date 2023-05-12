@@ -40,15 +40,15 @@ func main() {
 	l.Info("create router")
 
 	router := mux.NewRouter()
-	conf := config.GetConfig()
+	conf, envConf := config.GetConfig()
 
-	beforeStart(router, conf)
+	beforeStart(router, conf, envConf)
 	start(router, conf)
 }
 
-func beforeStart(router *mux.Router, conf *config.Config) {
+func beforeStart(router *mux.Router, conf *config.Config, envConf *config.EnvConf) {
 	l := logg.GetLogger()
-	cli, _ := postgresql.NewClient(context.TODO(), l, conf.PostgresDb)
+	cli, _ := postgresql.NewClient(context.TODO(), l, conf.PostgresDb, envConf)
 
 	l.Info("MakeTables(if they don't exist)")
 	go makeTables(cli, conf)
