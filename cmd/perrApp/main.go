@@ -51,6 +51,7 @@ func beforeStart(router *mux.Router, conf *config.Config, envConf *config.EnvCon
 	l := logg.GetLogger()
 	cli, _ := postgresql.NewClient(context.TODO(), l, conf.PostgresDb, envConf)
 
+	l.Info("Set data from .env")
 	setKeysJWT(envConf)
 
 	l.Info("MakeTables(if they don't exist)")
@@ -154,11 +155,8 @@ func getListener(conf *config.Config) (net.Listener, error) {
 }
 
 func setKeysJWT(envConf *config.EnvConf) {
-	fmt.Println(envConf.SigningKeyAdmin, envConf.SigningKeyUser)
 	authCheck.MySigningKeyAdmin = []byte(envConf.SigningKeyAdmin)
 	authCheck.MySigningKeyUser = []byte(envConf.SigningKeyUser)
-	fmt.Println(string(authCheck.MySigningKeyAdmin), string(authCheck.MySigningKeyUser))
-
 }
 
 func makeAdmins(client postgresql.Client, conf *config.Config) {
