@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-var MySigningKeyUser = []byte("Admin")
-var MySigningKeyAdmin = []byte("User")
+var MySigningKeyUser []byte
+var MySigningKeyAdmin []byte
 
 func Admin(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

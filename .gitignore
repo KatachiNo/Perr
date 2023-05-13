@@ -15,7 +15,7 @@
 # vendor/
 
 #Remove files type of .env
-*.env
+#*.env
 
 #ETC
 .idea

@@ -17,12 +17,12 @@ type Config struct {
 }
 
 type PostgresDb struct {
-	Username                 string `yaml:"username"`
-	Host                     string `yaml:"host"`
-	Port                     string `yaml:"port"`
-	Dbname                   string `yaml:"dbname"`
-	SSLMode                  string `yaml:"sslmode"`
-	Password                 string `yaml:"password" env:"PASSWORD" env-default:"postgres"`
+	Username string `yaml:"username"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Dbname   string `yaml:"dbname"`
+	SSLMode  string `yaml:"sslmode"`
+	// Password                 string `yaml:"password" env:"PASSWORD" env-default:"postgres"`
 	MaxAttemptsForConnection string `yaml:"max-attempts-for-connection" env-default:"10"`
 	MakeStartTables          string `yaml:"make-start-tables" env-default:"false"`
 	MakeStartAdmin           string `yaml:"make-start-admin" env-default:"false"`

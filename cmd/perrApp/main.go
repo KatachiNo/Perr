@@ -6,6 +6,7 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
+	"github.com/KatachiNo/Perr/internal/authCheck"
 	"github.com/KatachiNo/Perr/internal/dataBase/categoryTable"
 	categoryTableDb "github.com/KatachiNo/Perr/internal/dataBase/categoryTable/db"
 	"github.com/KatachiNo/Perr/internal/dataBase/orders"
@@ -49,6 +50,8 @@ func main() {
 func beforeStart(router *mux.Router, conf *config.Config, envConf *config.EnvConf) {
 	l := logg.GetLogger()
 	cli, _ := postgresql.NewClient(context.TODO(), l, conf.PostgresDb, envConf)
+
+	setKeysJWT(envConf)
 
 	l.Info("MakeTables(if they don't exist)")
 	go makeTables(cli, conf)
@@ -150,7 +153,14 @@ func getListener(conf *config.Config) (net.Listener, error) {
 	return listener, listenErr
 }
 
-// изменено
+func setKeysJWT(envConf *config.EnvConf) {
+	fmt.Println(envConf.SigningKeyAdmin, envConf.SigningKeyUser)
+	authCheck.MySigningKeyAdmin = []byte(envConf.SigningKeyAdmin)
+	authCheck.MySigningKeyUser = []byte(envConf.SigningKeyUser)
+	fmt.Println(string(authCheck.MySigningKeyAdmin), string(authCheck.MySigningKeyUser))
+
+}
+
 func makeAdmins(client postgresql.Client, conf *config.Config) {
 	if conf.MakeStartAdmin == "true" {
 		l := logg.GetLogger()
