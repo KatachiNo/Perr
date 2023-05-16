@@ -13,3 +13,24 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+#Remove files type of .env
+#*.env
+
+#ETC
+.idea
+.vscode
+
+#Remove logs
+*.log
+/logFiles
+
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+

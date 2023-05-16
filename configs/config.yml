@@ -1,0 +1,12 @@
+server:
+  type: port
+  port: 8080
+
+postgresConfigDb:
+  username: postgres
+  host: 0.0.0.0
+  port: 5555
+  dbname: postgres
+  sslmode: disable
+  make-start-tables: true
+  make-start-admin: true
