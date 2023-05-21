@@ -39,19 +39,18 @@ func NewRegister(storage Storage, l *logg.Logger) handlers.Handler {
 func (h *handler) Register(router *mux.Router) {
 	router.HandleFunc(userReg, h.userReg).Methods("POST")
 	router.HandleFunc(userAuth, h.userAuth).Methods("POST")
-	go router.Handle(userChange, authCheck.Admin(h.userChange)).Methods("GET")
-	go router.Handle(userDelete, authCheck.Admin(h.userDelete)).Methods("GET")
+	router.Handle(userChange, authCheck.Admin(h.userChange)).Methods("GET")
+	router.Handle(userDelete, authCheck.Admin(h.userDelete)).Methods("DELETE")
 
 }
 
 func (h *handler) userReg(w http.ResponseWriter, r *http.Request) {
 	var user User
 	json.NewDecoder(r.Body).Decode(&user)
-	fmt.Println("reg")
-	fmt.Println(user)
+
 	err := h.storage.UserCreate(context.TODO(), user)
 	if err != nil {
-		fmt.Println(err)
+		h.l.Error(err)
 		w.WriteHeader(http.StatusBadRequest)
 	}
 }
@@ -63,7 +62,7 @@ func (h *handler) userAuth(w http.ResponseWriter, r *http.Request) {
 	u, errFind := h.storage.UserFind(context.TODO(), user.Login)
 	if errFind != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println(errFind)
+		h.l.Error(errFind)
 	}
 
 	saltTable := u.Salt
@@ -104,13 +103,11 @@ func (h *handler) userAuth(w http.ResponseWriter, r *http.Request) {
 }
 
 func genJWT(categoryOfUser string) (string, error) {
-
+	l := logg.GetLogger()
 	token := jwt.New(jwt.SigningMethodHS512)
 
 	claims := token.Claims.(jwt.MapClaims)
 
-	//claims["authorized"] = true
-	//claims["user"] = "Vlad"
 	claims["exp"] = time.Now().Add(time.Hour * 2160).Unix()
 
 	var tokenString string
@@ -124,7 +121,7 @@ func genJWT(categoryOfUser string) (string, error) {
 	}
 
 	if err != nil {
-		fmt.Errorf("Something went wrong: %s", err.Error())
+		l.Error(err)
 	}
 	return tokenString, nil
 }
@@ -138,12 +135,12 @@ func (h *handler) userDelete(w http.ResponseWriter, r *http.Request) {
 	intId, errConv := strconv.Atoi(id)
 	if errConv != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errConv)
+		h.l.Error(errConv)
 	}
 
 	errDel := h.storage.UserDelete(context.TODO(), intId)
 	if errDel != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Print(errDel)
+		h.l.Error(errDel)
 	}
 }

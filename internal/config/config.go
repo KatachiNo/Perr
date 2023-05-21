@@ -1,6 +1,7 @@
 package config
 
 import (
+	"path/filepath"
 	"sync"
 
 	"github.com/KatachiNo/Perr/pkg/logg"
@@ -43,7 +44,9 @@ func GetConfig() (*Config, *EnvConf) {
 		l := logg.GetLogger()
 		l.Info("Getting configuration /configs/config.yml")
 		instance = &Config{}
-		if err := cleanenv.ReadConfig("configs/config.yml", instance); err != nil {
+
+		path := filepath.Join("configs", "config.yml") //"configs/config.yml"
+		if err := cleanenv.ReadConfig(path, instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
 
 			l.Info(help)
@@ -52,6 +55,7 @@ func GetConfig() (*Config, *EnvConf) {
 
 		l.Info("Getting configuration .env")
 		instance2 = &EnvConf{}
+
 		if err := cleanenv.ReadConfig(".env", instance2); err != nil {
 			help, _ := cleanenv.GetDescription(instance2, nil)
 
