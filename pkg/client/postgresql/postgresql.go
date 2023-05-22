@@ -19,8 +19,15 @@ func NewClient(ctx context.Context, l *logg.Logger, conf config.PostgresDb, envC
 
 	l.Info("Entrance to NewClient Postgresql")
 
+	dbPort := conf.Port
+	host := conf.Host
+	if conf.Port == "docker" {
+		dbPort = "5432"
+		host = "postgres"
+	}
+	fmt.Print(dbPort)
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		conf.Host, conf.Port, conf.Username, envConf.Password, conf.Dbname)
+		host, dbPort, conf.Username, envConf.Password, conf.Dbname)
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		l.Error(err)

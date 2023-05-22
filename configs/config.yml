@@ -5,7 +5,7 @@ server:
 postgresConfigDb:
   username: postgres
   host: 0.0.0.0
-  port: 5555
+  port: docker
   dbname: postgres
   sslmode: disable
   make-start-tables: true
