@@ -23,7 +23,7 @@ services:
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
-    ### Если требуется открыть порт для доступа к базе данных
+    ## Если требуется открыть порт для доступа к базе данных
     ##ports:
     ##  - "5554:5432"
     volumes:
